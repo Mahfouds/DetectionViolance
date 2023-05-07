@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Pages / Login - NiceAdmin Bootstrap Template</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+</head>
+
+<body>
+
+  <main>
+    <div class="container">
+
+      <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
+
+              <div class="card mb-3">
+
+                <div class="card-body">
+
+                  <div class="pt-4 pb-2">
+                    <h5 class="card-title text-center pb-0 fs-4">Create an Account</h5>
+                    <p class="text-center small">Enter your personal details to create account</p>
+                  </div>
+
+                  <form class="row g-3 needs-validation">
+
+                    <div *ngIf="notif == 1" class="alert alert-success alert-dismissible fade show" role="alert">
+                      <strong>Compte</strong> ajouté avec succes .
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  
+                    <div *ngIf="notif == 2" class="alert alert-warning alert-dismissible fade show" role="alert">
+                      <strong>Probleme !</strong> dans l'ajout de compte.
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <div class="col-12">
+                      <label for="yourUsername" class="form-label">userName</label>
+                      <div class="input-group has-validation">
+                        <span class="input-group-text" id="inputGroupPrepend">@</span>
+                        <input type="text" name="login" [(ngModel)]="user.userName" class="form-control" />
+                      </div>
+                    </div>
+                  
+                    <div class="col-6">
+                      <label for="region" class="form-label">Region</label>
+                      <div class="input-group has-validation">
+                        <select name="region" [(ngModel)]="user.region" class="form-select" id="region" required>
+                          <option selected value="Maroc">Maroc</option>
+                          <option value="Europe">Europe</option>
+                        </select>
+                      </div>
+                    </div>
+                  
+                    <div class="col-6">
+                      <label for="age" class="form-label">Catégorie d'age</label>
+                      <div class="input-group has-validation">
+                        <select name="age" [(ngModel)]="user.categoryAge" class="form-select" id="age" required>
+                          <option selected value="Adulte">Adulte</option>
+                          <option value="Mineur">Mineur</option>
+                        </select>
+                      </div>
+                    </div>
+                  
+                    <div class="col-12">
+                      <label for="yourPassword" class="form-label">Password</label>
+                      <div class="input-group has-validation">
+                        <input type="password" [(ngModel)]="user.pass" name="pass" class="form-control">
+                      </div>
+                    </div>
+                    
+                    <div class="col-12">
+                      <label for="yourPassword" class="form-label">Confirm Password</label>
+                      <div class="input-group has-validation">
+                        <input type="password" name="pass2" [(ngModel)]="confirmPassword" (input)="checkPasswordMatch()" class="form-control">
+                      </div>
+                      <div *ngIf="passwordMismatch" class="text-danger">Les mots de passe ne correspondent pas.</div>
+                    </div>
+
+                    <div class="col-12">
+                      <button class="btn btn-primary" (click)="register()" [disabled]="passwordMismatch">Inscription</button>
+                    </div>
+
+
+                  <div class="col-12">
+                      <p class="small mb-0">Already have an account?<a href="">log in</a></p>
+                    </div>
+                  </form>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main><!-- End #main -->
+
+  </body>
+
+</html>
