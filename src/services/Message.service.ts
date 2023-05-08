@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { MessageDTO } from 'src/models/MessageDTO';
 import { AuthService } from './auth-service.service';
+import { User } from 'src/models/User';
+import { UserDTO } from 'src/models/UserDTO';
 @Injectable({
   providedIn: 'root'
 })
@@ -45,6 +47,7 @@ export class MessageService {
     return Message;
   }
   envoyerMessage(msg: MessageDTO): Observable<void> {
+    console.log("from service voila msg : "+JSON.stringify(msg));
     const token = this.authService.getToken();
     const httpOptions = {
       headers: {
@@ -56,5 +59,26 @@ export class MessageService {
     console.log(Message);
     return Message;
 
+  }
+  getViolanceState(path:string,region:number):Observable<any>{
+    return this.httpClient.get<any>("http://127.0.0.1:5000/getResult/"+path+"/"+region);
+  }
+  getAllusers():Observable<UserDTO[]>{
+    const token = this.authService.getToken();
+    const httpOptions = {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    };
+    return this.httpClient.get<UserDTO[]>("http://localhost:8080/Chat/selectAllContacts",httpOptions);
+  }
+  getMessageBtw2Contcats(id1:number,id2:number):Observable<MessageDTO[]>{
+    const token = this.authService.getToken();
+    const httpOptions = {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    };
+    return this.httpClient.get<MessageDTO[]>("http://localhost:8080/Chat/getMessagesBtw2Contacts/"+id1+"/"+id2,httpOptions);
   }
 }
