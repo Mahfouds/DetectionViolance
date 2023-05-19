@@ -2,7 +2,7 @@ export class UserDTO {
   id:number;
   username:string;
   region:string;
-  vous:boolean
+  vous:boolean;
   constructor(){
     this.id=0;
     this.username='';

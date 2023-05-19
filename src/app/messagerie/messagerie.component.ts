@@ -1,7 +1,11 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Observable } from 'rxjs';
+import { CategoryAge } from 'src/models/CategoryAge';
 import { MessageDTO } from 'src/models/MessageDTO';
+import { REGION } from 'src/models/REGION';
 import { User } from 'src/models/User';
 import { UserDTO } from 'src/models/UserDTO';
+import { UserInfoDTO } from 'src/models/UserInfoDTO';
 import { Message } from 'src/models/message';
 import { MessageService } from 'src/services/Message.service';
 import { AuthService } from 'src/services/auth-service.service';
@@ -20,6 +24,7 @@ export class MessagerieComponent implements OnInit {
   messages: MessageDTO[] = [];
   users: UserDTO[];
   currentDestinatire: number;
+  currentDestinatireName: string;
   image!: String;
   id: number = 0;
   m: MessageDTO = new MessageDTO;
@@ -27,10 +32,15 @@ export class MessagerieComponent implements OnInit {
   test = false
   msg = new Message();
   envoyerMessageDTO: MessageDTO;
-
-  vous: number
+  violanceState=false;
+  currentInfos:UserInfoDTO;
+region:number;
+  vous: number;
   constructor(private service: MessageService, private authService: AuthService) {
+    this.region=0;
+    this.currentDestinatireName='';
     this.id = this.authService.getId();
+    this.currentInfos=new UserInfoDTO();
     this.users = [];
     this.messages = [];
     this.currentDestinatire = 0;
@@ -49,29 +59,82 @@ export class MessagerieComponent implements OnInit {
     this.id = this.authService.getId();
     this.getAllcontacts();
     this.vous = this.authService.getId();
-    this.scrollToBottom();
+    //this.scrollToBottom();
+    this.authService.getUserInfos().subscribe(
+      res=>{console.log("User Infos dsds : "+JSON.stringify(res));
+    this.currentInfos=res;
+    },
+      err=>{console.log(err)}
+    );
 
   }
+  getViolanceState(path:string):any{
+    path="D:/S2/DetectionViolance/src/"+path;
+    return this.service.getViolanceState(path, 2).subscribe(
+      res => {
+        if (res.result == true) {
+          console.log(res);
+          return true;
+        } else {
+          return false;
+        }
+      },
+     err => {
+        console.log(err);
+        return false;
+      }
+    );
+  }
+
 
   EnvoyerMessages() {
     if (this.image != null) {
       const path = "D:/S2/DetectionViolance/src/assets/images/" + this.image;
       //const path="D:/S2/modelML/violenceDetection/violenceDetection/inputs/"+this.image;
-      this.service.getViolanceState(path, 2).subscribe(
+
+      if(this.currentInfos.region==REGION.Europe)
+      this.region=2;else this.region=1;
+      this.service.getViolanceState(path, this.region).subscribe(
         (res) => {
           console.log(res)
+
           if (res.result == true) {
-            alert("violance");
+            if(this.currentInfos.categoryAge===CategoryAge.Mineur)
+            alert("t'es mineur , ce contenu est violant a votre age ");
+            else{
+              this.envoyerMessageDTO.id_emmet = this.vous;
+              this.envoyerMessageDTO.id_recep = this.currentDestinatire;
+              this.envoyerMessageDTO.violanceState=true;
+              //this.envoyerMessageDTO.texte = ref.value;
+              //this.envoyerMessageDTO.Img = "assets/images/" + this.image;
+              this.envoyerMessageDTO.setImage("assets/images/"+this.image);
+
+              //this.envoyerMessageDTO.Img = path;
+              console.log("message: " + this.envoyerMessageDTO.image)
+              //this.listMessage.push(ref.value);
+              //console.log(this.listMessage)
+
+
+              //this.image = ref1.value;
+
+              this.service.envoyerMessage(this.envoyerMessageDTO).subscribe(
+                // console.log('les messages ont été envoyee avec succès !');
+                res => { this.getMessagesBtw2Contacts(this.currentDestinatire,'');
+              this.envoyerMessageDTO=new MessageDTO();this.image=''; },
+                err => { }
+              );
+
+            }
           } else {
             this.envoyerMessageDTO.id_emmet = this.vous;
             this.envoyerMessageDTO.id_recep = this.currentDestinatire;
-
+            this.envoyerMessageDTO.violanceState=false;
             //this.envoyerMessageDTO.texte = ref.value;
             //this.envoyerMessageDTO.Img = "assets/images/" + this.image;
-            this.envoyerMessageDTO.setImage("assets/images/" + this.image);
+            this.envoyerMessageDTO.setImage("assets/images/"+this.image);
 
             //this.envoyerMessageDTO.Img = path;
-            console.log("message: " + this.envoyerMessageDTO.Img)
+            console.log("message: " + this.envoyerMessageDTO.image)
             //this.listMessage.push(ref.value);
             //console.log(this.listMessage)
 
@@ -80,7 +143,10 @@ export class MessagerieComponent implements OnInit {
 
             this.service.envoyerMessage(this.envoyerMessageDTO).subscribe(
               // console.log('les messages ont été envoyee avec succès !');
-              res => { this.getMessagesBtw2Contacts(this.currentDestinatire); },
+              res => { this.getMessagesBtw2Contacts(this.currentDestinatire,'');
+              this.envoyerMessageDTO=new MessageDTO();this.image='';
+
+            },
               err => { }
             );
 
@@ -94,7 +160,7 @@ export class MessagerieComponent implements OnInit {
     } else {
       this.envoyerMessageDTO.id_emmet = this.vous;
       this.envoyerMessageDTO.id_recep = this.currentDestinatire;
-
+      this.envoyerMessageDTO.violanceState=false;
       //this.envoyerMessageDTO.texte = ref.value;
       //this.envoyerMessageDTO.Img = path;
       console.log("message: " + this.envoyerMessageDTO)
@@ -109,7 +175,11 @@ export class MessagerieComponent implements OnInit {
 
       this.service.envoyerMessage(this.envoyerMessageDTO).subscribe(
         // console.log('les messages ont été envoyee avec succès !');
-        res => { this.getMessagesBtw2Contacts(this.currentDestinatire); },
+        res => { this.getMessagesBtw2Contacts(this.currentDestinatire,'');
+
+        this.envoyerMessageDTO=new MessageDTO();this.image='';
+
+      },
         err => { }
       );
     }
@@ -155,8 +225,9 @@ export class MessagerieComponent implements OnInit {
       }
     });
   }
-  getMessagesBtw2Contacts(id: number) {
+  getMessagesBtw2Contacts(id: number,username:string) {
     this.currentDestinatire = id;
+    this.currentDestinatireName=username;
     this.service.getMessageBtw2Contcats(this.vous, id).subscribe(
       res => { this.messages = res; console.log("messages : " + this.messages) },
       err => { console.log("getAllcontacts error : " + err) }

@@ -32,9 +32,9 @@
               <input type="text" class="form-control" placeholder="Search...">
             </div>
             <div class="contacts" *ngFor="let user of users;let i=index">
-              <ul (click)="getMessagesBtw2Contacts(user.id)" class="list-group-item list-group-item-action border-0 "
+              <ul (click)="getMessagesBtw2Contacts(user.id,user.username)" class="list-group-item list-group-item-action border-0 "
                 style="cursor: pointer;">
-                <div class="badge bg-success float-right">5</div>
+
                 <div class="d-flex align-items-start">
                   <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle mr-1"
                     alt="Vanessa Tucker" width="40" height="40">
@@ -68,7 +68,7 @@
                   <p style="margin-left: 50px; margin-top: 8px; font-style:bold;"></p>
 
                   <div class="chat-about">
-                    <h6 class="m-b-0"></h6>
+                    <h6 class="m-b-0 uppercase">{{currentDestinatireName}}</h6>
 
                   </div>
                 </div>
@@ -82,12 +82,18 @@
                     <div class="message-data">
                       <span class="message-data-time">{{message.date}}</span>
                     </div>
-                    <div class="message my-message">
-                      {{ message.texte }}
-                      <br>
-                      <div class="image-container">
-                        <img src="assets/images/aid.jpg" alt="" class="image">
+                    <div class="message my-message"> {{message.texte}}
+                    <div class="image-container" *ngIf="message.image!=''">
+                      <div class="image-wrapper">
+                        <img *ngIf="message.violanceState==false||currentInfos.categoryAge=='Adulte';else alternateImage"  src="{{message.image}}" alt="" class="image">
+                        <ng-template #alternateImage>
+                          <div class="image-container">
+                            <img src="{{message.image}}" alt="" class="image" style="filter: blur(5px);">
+
+                          </div>
+                        </ng-template>
                       </div>
+                    </div>
                     </div>
                   </li>
                 </ul>
@@ -100,8 +106,10 @@
                       </div>
                       <div class="message my-message float-right"> {{message.texte}}
                         <br>
-                        <div class="image-container float-right">
-                          <img src="assets/images/aid.jpg" alt="" class="image">
+                        <div class="image-container float-right" *ngIf="message.image!=''">
+                          <img *ngIf="message.violanceState==false||currentInfos.categoryAge=='Adulte';else alternateImageright" src="{{message.image}}" alt="" class="image">
+                          <ng-template #alternateImageright> <img src="{{message.image}}" alt="" class="image" style="filter: blur(5px);"><span>This image is violent</span></ng-template>
+
                         </div>
 
                       </div>

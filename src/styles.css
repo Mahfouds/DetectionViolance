@@ -438,4 +438,7 @@ body {
   width: 100%;
   height: auto;
 }
+.uppercase {
+  text-transform: uppercase;
+}
 
